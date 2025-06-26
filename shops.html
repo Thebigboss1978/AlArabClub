@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Shops & Hotels | AlArab Club</title>
+  <style>
+    body { margin:0;font-family:sans-serif;background:#111;color:#fff;text-align:center;}
+    header { background:#000;padding:20px; }
+    header h1 { color:#FFD700; }
+    .container { display:flex; flex-wrap:wrap; justify-content:center; gap:20px; padding:20px; }
+    .place { background:#222;border-radius:10px;padding:15px;width:300px; }
+    .place img { width:100%; height:200px; object-fit:cover; border-radius:6px; }
+    .place h3 { color:#00ffae; }
+  </style>
+</head>
+<body>
+  <header><h1>🏨 Shops & Hotels near the Pyramids</h1></header>
+  <div class="container" id="places">Loading...</div>
+  <script>
+    async function load() {
+      const res = await fetch('/api/places');
+      const data = await res.json();
+      const container = document.getElementById('places');
+      container.innerHTML = '';
+      data.results.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'place';
+        const img = p.photos ? `<img src="https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${p.photos[0].photo_reference}&key=AIzaSyAcAoCT9_ec4pkV2nu6QtwyO8XBrN0vedM" alt="${p.name}">` : '';
+        div.innerHTML = img + `<h3>${p.name}</h3><p>${p.vicinity}</p>`;
+        container.appendChild(div);
+      });
+    }
+    load();
+  </script>
+</body>
+</html>
