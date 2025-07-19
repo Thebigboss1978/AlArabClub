@@ -1,27 +1,109 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <title>⟁ AlArab Matrix – Gold Responsive</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AlArab Club</title>
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100%;
+      background-color: black;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
 </head>
 <body>
-  <header>
-    <div class="logo">7<br>7<br>7</div>
-    <h1>AlArab VIP Club</h1>
-    <p>Experience the mystery, magic, and thrill of the pyramids</p>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="shops.html">Shops & Hotels</a>
-    </nav>
-  </header>
-  <main>
-    <section>
-      <h2>Welcome to AlArab Club</h2>
-      <p>This is your gateway to unforgettable adventures near the Pyramids.</p>
-    </section>
-  </main>
+  <canvas id="matrix"></canvas>
+
+  <script>
+    const canvas = document.getElementById("matrix");
+    const ctx = canvas.getContext("2d");
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      calculateFontSize(); // Recalculate on resize
+    });
+
+    // Responsive font size based on window width
+    let fontSize;
+    function calculateFontSize() {
+      const baseWidth = 1920;
+      const scale = window.innerWidth / baseWidth;
+      fontSize = Math.max(10, Math.floor(15 * scale));
+      ctx.font = fontSize + "px monospace";
+    }
+    calculateFontSize();
+
+    let columns = Math.floor(window.innerWidth / fontSize);
+    let drops = Array(columns).fill(1);
+    let speeds = Array(columns).fill().map(() => Math.random() * 2.8 + 0.2);
+
+    const words = [
+      "700", "70", "7", "700707", "777", "000",
+      "A", "L", "A", "R", "A", "B",
+      "CLUB", "MARHABA", "SHARIF", "SHAWEESH", "𓂀"
+    ];
+
+    let activeLetters = [];
+
+    // Detect user theme
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    let bgColor = prefersDark ? "rgba(0, 0, 0, 0.1)" : "rgba(255, 255, 255, 0.15)";
+    let baseColor = prefersDark ? "#FFD700" : "#444";
+    let flashColor = prefersDark ? "#FFF176" : "#888";
+
+    function draw() {
+      ctx.fillStyle = bgColor;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      activeLetters = [];
+
+      for (let i = 0; i < columns; i++) {
+        const text = words[Math.floor(Math.random() * words.length)];
+        const x = i * fontSize;
+        const y = drops[i] * fontSize;
+
+        ctx.fillStyle = baseColor;
+        ctx.fillText(text, x, y);
+
+        activeLetters.push({ text, x, y });
+
+        drops[i] += speeds[i];
+
+        if (y > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+          speeds[i] = Math.random() * 2.8 + 0.2;
+        }
+      }
+    }
+
+    setInterval(draw, 50);
+
+    function flashLetter() {
+      if (activeLetters.length === 0) return;
+      const pick = activeLetters[Math.floor(Math.random() * activeLetters.length)];
+
+      ctx.fillStyle = flashColor;
+      ctx.fillText(pick.text, pick.x, pick.y);
+
+      setTimeout(() => {
+        ctx.fillStyle = baseColor;
+        ctx.fillText(pick.text, pick.x, pick.y);
+      }, 150);
+    }
+
+    setInterval(flashLetter, 1200);
+  </script>
 </body>
 </html>
+
