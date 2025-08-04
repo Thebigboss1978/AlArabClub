@@ -1,109 +1,227 @@
+<!-- Dynamic Background: Particle Logo, Matrix Glyphs, and Glowing Circle -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
-  <meta charset="UTF-8" />
-  <title>⟁ AlArab Matrix – Gold Responsive</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="utf-8"/>
+  <title>AlArab Logo Universe</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
       overflow: hidden;
-      height: 100%;
-      background-color: black;
+      background: black;
+      font-family: monospace;
     }
     canvas {
       display: block;
+      position: absolute;
+      top: 0; left: 0;
+    }
+    .matrix-background {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 255, 0, 0.04) 0px,
+        rgba(0, 255, 0, 0.04) 2px,
+        transparent 2px,
+        transparent 4px
+      );
+      animation: scrollMatrix 1.6s linear infinite;
+      z-index: 0;
+    }
+    @keyframes scrollMatrix {
+      from { background-position: 0 0; }
+      to   { background-position: 0 100%; }
+    }
+    .glyphs {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .glyph {
+      position: absolute;
+      color: #39ff14;
+      font-size: calc(14px + 0.4vw);
+      opacity: 0.06;
+      animation: drift 2s infinite linear;
+    }
+    @keyframes drift {
+      0%   { transform: translateY(0); opacity: 0.08; }
+      50%  { opacity: 0.3; }
+      100% { transform: translateY(100vh); opacity: 0; }
+    }
+    .eye-container {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: calc(6vw + 12px);
+      color: #00ffcc;
+      text-shadow:
+        0 0 10px #00ffee,
+        0 0 20px #00ffee,
+        0 0 40px #00ffee;
+      animation: pulse 4s infinite ease-in-out;
+      z-index: 2;
+      pointer-events: none;
+    }
+    @keyframes pulse {
+      0%   { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+      50%  { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
     }
   </style>
 </head>
 <body>
-  <canvas id="matrix"></canvas>
+  <div class="matrix-background"></div>
+  <div class="glyphs" id="glyphs"></div>
+  <div class="eye-container" id="eye">𓂀</div>
+  <canvas id="canvas"></canvas>
+
+  <!-- 🎤 Voice Audio -->
+  <audio id="introSound" src="https://alarabclub777.vercel.app/sounds/intro.mp3" preload="auto"></audio>
+  <audio id="clickSound" src="https://alarabclub777.vercel.app/sounds/click.mp3" preload="auto"></audio>
 
   <script>
-    const canvas = document.getElementById("matrix");
+    const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const radius = 150;
+    const symbols = [".", "·", ":", "•", "*"];
+    const spacing = 7;
+    const fontSize = 10;
+    let particles = [];
+    const mouse = { x: centerX, y: centerY };
+    let isExploded = false;
+    let nextCycle = Date.now() + getRandomDelay();
 
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+    function getRandomDelay() {
+      return (Math.floor(Math.random() * 70) + 7) * 1000;
     }
-    resizeCanvas();
-    window.addEventListener('resize', () => {
-      resizeCanvas();
-      calculateFontSize(); // Recalculate on resize
-    });
 
-    // Responsive font size based on window width
-    let fontSize;
-    function calculateFontSize() {
-      const baseWidth = 1920;
-      const scale = window.innerWidth / baseWidth;
-      fontSize = Math.max(10, Math.floor(15 * scale));
-      ctx.font = fontSize + "px monospace";
-    }
-    calculateFontSize();
-
-    let columns = Math.floor(window.innerWidth / fontSize);
-    let drops = Array(columns).fill(1);
-    let speeds = Array(columns).fill().map(() => Math.random() * 2.8 + 0.2);
-
-    const words = [
-      "700", "70", "7", "700707", "777", "000",
-      "A", "L", "A", "R", "A", "B",
-      "CLUB", "MARHABA", "SHARIF", "SHAWEESH", "𓂀"
-    ];
-
-    let activeLetters = [];
-
-    // Detect user theme
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    let bgColor = prefersDark ? "rgba(0, 0, 0, 0.1)" : "rgba(255, 255, 255, 0.15)";
-    let baseColor = prefersDark ? "#FFD700" : "#444";
-    let flashColor = prefersDark ? "#FFF176" : "#888";
-
-    function draw() {
-      ctx.fillStyle = bgColor;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      activeLetters = [];
-
-      for (let i = 0; i < columns; i++) {
-        const text = words[Math.floor(Math.random() * words.length)];
-        const x = i * fontSize;
-        const y = drops[i] * fontSize;
-
-        ctx.fillStyle = baseColor;
-        ctx.fillText(text, x, y);
-
-        activeLetters.push({ text, x, y });
-
-        drops[i] += speeds[i];
-
-        if (y > canvas.height && Math.random() > 0.975) {
-          drops[i] = 0;
-          speeds[i] = Math.random() * 2.8 + 0.2;
+    const offCanvas = document.createElement("canvas");
+    offCanvas.width = canvas.width;
+    offCanvas.height = canvas.height;
+    const offCtx = offCanvas.getContext("2d");
+    offCtx.fillStyle = "white";
+    offCtx.beginPath();
+    offCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+    offCtx.fill();
+    const imageData = offCtx.getImageData(0, 0, canvas.width, canvas.height);
+    for (let y = 0; y < canvas.height; y += spacing) {
+      for (let x = 0; x < canvas.width; x += spacing) {
+        const i = (y * canvas.width + x) * 4;
+        if (imageData.data[i + 3] > 128) {
+          particles.push({
+            x,
+            y,
+            baseX: x,
+            baseY: y,
+            char: symbols[Math.floor(Math.random() * symbols.length)],
+            glow: Math.random(),
+            vx: 0,
+            vy: 0
+          });
         }
       }
     }
 
-    setInterval(draw, 50);
+    canvas.addEventListener("mousemove", e => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
 
-    function flashLetter() {
-      if (activeLetters.length === 0) return;
-      const pick = activeLetters[Math.floor(Math.random() * activeLetters.length)];
+    canvas.addEventListener("click", e => {
+      const dx = e.clientX - centerX;
+      const dy = e.clientY - centerY;
+      if (Math.sqrt(dx * dx + dy * dy) < radius) {
+        explodeParticles();
+        document.getElementById("clickSound").play();
+        document.getElementById("eye").style.left = "55%";
+        setTimeout(() => {
+          document.getElementById("eye").style.left = "50%";
+        }, 1000);
+      }
+    });
 
-      ctx.fillStyle = flashColor;
-      ctx.fillText(pick.text, pick.x, pick.y);
-
-      setTimeout(() => {
-        ctx.fillStyle = baseColor;
-        ctx.fillText(pick.text, pick.x, pick.y);
-      }, 150);
+    function explodeParticles() {
+      for (let p of particles) {
+        p.vx = (Math.random() - 0.5) * 20;
+        p.vy = (Math.random() - 0.5) * 20;
+      }
+      isExploded = true;
+      nextCycle = Date.now() + getRandomDelay();
     }
 
-    setInterval(flashLetter, 1200);
+    function regroupParticles() {
+      isExploded = false;
+      nextCycle = Date.now() + getRandomDelay();
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.font = fontSize + "px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      if (Date.now() > nextCycle) {
+        if (!isExploded) explodeParticles();
+        else regroupParticles();
+      }
+
+      for (let p of particles) {
+        if (isExploded) {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vx *= 0.98;
+          p.vy *= 0.98;
+        } else {
+          p.x -= (p.x - p.baseX) * 0.05;
+          p.y -= (p.y - p.baseY) * 0.05;
+        }
+
+        const dx = mouse.x - p.x;
+        const dy = mouse.y - p.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const force = Math.max(0, 150 - dist) / 150;
+        const moveX = (dx / dist) * force * 10 || 0;
+        const moveY = (dy / dist) * force * 10 || 0;
+        p.x -= (p.x - p.baseX - moveX) * 0.1;
+        p.y -= (p.y - p.baseY - moveY) * 0.1;
+
+        const flicker = Math.sin(Date.now() * 0.005 + p.x * 0.01) * 0.3 + 0.7;
+        ctx.fillStyle = `rgba(255, 215, 0, ${flicker})`;
+        ctx.fillText(p.char, p.x, p.y);
+      }
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    const glyphs = "𓂀𓏏𓆣𓋹𓉐𓄿𓇳𓎛𓈖𓃭𓍯𓊃𓊪𓃾𓈎𓅱𓅓𓃀𓇋𓍿𓐍𓊽𓌳𓋴𓇯𓏠𓉔𓁷ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*()_+{}[]|\\/~?><!-=:,.αβγδεζηθικλμνξοπρστυφχψωАБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгдеёжзийклмнопрстуфхцчшщьюяشعرابشيخفجثجظرزسضطىةءؤإأآ✓∞≠±∑∂∆µπ⊕⊗⊙⊥∩∪∈∉∀∃√∛☥☯☸♁⚛🔥✨🌌💫S⋄A⋄L⋄S⋄";
+    const container = document.getElementById("glyphs");
+    for (let i = 0; i < 200; i++) {
+      const glyph = document.createElement("div");
+      glyph.className = "glyph";
+      glyph.style.left = `${Math.random() * 100}%`;
+      glyph.style.top = `-${Math.random() * 100}%`;
+      glyph.style.animationDelay = `${Math.random() * 2}s`;
+      glyph.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
+      container.appendChild(glyph);
+    }
+
+    window.addEventListener('click', () => {
+      const audio = document.getElementById("introSound");
+      audio.play().catch(err => {
+        console.warn("🎧 فشل تشغيل الصوت: ", err);
+      });
+    }, { once: true });
   </script>
 </body>
 </html>
-
