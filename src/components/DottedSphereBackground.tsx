@@ -5,9 +5,7 @@ import React, { useRef, useEffect, useState, useCallback } from 'react';
 const DottedSphereBackground: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glyphsContainerRef = useRef<HTMLDivElement>(null);
-  const eyeRef = useRef<HTMLDivElement>(null);
-  const introSoundRef = useRef<HTMLAudioElement>(null);
-  const clickSoundRef = useRef<HTMLAudioElement>(null);
+  const eyeRef = useRef<HTMLDivElement>(null); // Keep eyeRef as it's used for visual feedback
 
   const getRandomDelay = useCallback(() => {
     return (Math.floor(Math.random() * 70) + 7) * 1000;
@@ -36,7 +34,7 @@ const DottedSphereBackground: React.FC = () => {
     let animationFrameId: number;
     let particles: Particle[] = [];
     let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-    const fontSize = 10; // Moved fontSize here to be accessible by animate
+    const fontSize = 10;
 
     const initializeCanvas = () => {
       canvas.width = window.innerWidth;
@@ -46,9 +44,8 @@ const DottedSphereBackground: React.FC = () => {
       const radius = 150;
       const symbols = [".", "·", "7", "•", "𓁹"];
       const spacing = 7;
-      // fontSize is now defined outside this function
 
-      particles = []; // Clear existing particles on resize/re-init
+      particles = [];
 
       const offCanvas = document.createElement("canvas");
       offCanvas.width = canvas.width;
@@ -82,7 +79,7 @@ const DottedSphereBackground: React.FC = () => {
       }
     };
 
-    initializeCanvas(); // Initial setup
+    initializeCanvas();
 
     const handleResize = () => {
       initializeCanvas();
@@ -117,7 +114,7 @@ const DottedSphereBackground: React.FC = () => {
       const dy = e.clientY - centerY;
       if (Math.sqrt(dx * dx + dy * dy) < radius) {
         explodeParticles();
-        clickSoundRef.current?.play();
+        // Removed click sound playback
         if (eyeRef.current) {
           eyeRef.current.style.left = "55%";
           setTimeout(() => {
@@ -171,8 +168,7 @@ const DottedSphereBackground: React.FC = () => {
     const glyphs = "𓂀𓏏𓆣𓋹𓉐𓄿𓇳𓎛𓈖𓃭𓍯𓊃𓊪𓃾𓈎𓅱𓅓𓃀𓇋𓍿𓐍𓊽𓌳𓋴𓇯𓏠𓉔𓁷ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*()_+{}[]|\\/~?><!-=:,.αβγδεζηθικλμνξοπρστυφχψωАБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЮЯشعرابشيخفجثجظرزسضطىةءؤإأآ✓∞≠±∑∂∆µπ⊕⊗⊙⊥∩∪∈∉∀∃√∛☥☯☸  ⚛🔥✨🌌💫S⋄A⋄L⋄S⋄";
     const container = glyphsContainerRef.current;
     if (container) {
-      // Clear existing glyphs to prevent duplicates on re-render
-      container.innerHTML = ''; 
+      container.innerHTML = '';
       for (let i = 0; i < 200; i++) {
         const glyph = document.createElement("div");
         glyph.className = "glyph";
@@ -184,19 +180,12 @@ const DottedSphereBackground: React.FC = () => {
       }
     }
 
-    const handleFirstClick = () => {
-      introSoundRef.current?.play().catch(err => {
-        console.warn("🎧 Audio playback failed: ", err);
-      });
-      window.removeEventListener('click', handleFirstClick);
-    };
-    window.addEventListener('click', handleFirstClick, { once: true });
+    // Removed handleFirstClick and associated event listener
 
     return () => {
       window.removeEventListener('resize', handleResize);
       canvas.removeEventListener("mousemove", handleMouseMove);
       canvas.removeEventListener("click", handleClick);
-      window.removeEventListener('click', handleFirstClick); // Ensure cleanup if not triggered
       cancelAnimationFrame(animationFrameId);
     };
   }, [isExploded, nextCycle, getRandomDelay]);
@@ -207,9 +196,7 @@ const DottedSphereBackground: React.FC = () => {
       <div className="glyphs" ref={glyphsContainerRef}></div>
       <div className="eye-container" ref={eyeRef}>𓁹</div>
       <canvas id="canvas" ref={canvasRef} className="absolute top-0 left-0 block"></canvas>
-
-      <audio id="introSound" src="/sounds/intro.mp3" preload="auto" ref={introSoundRef}></audio>
-      <audio id="clickSound" src="/sounds/click.mp3" preload="auto" ref={clickSoundRef}></audio>
+      {/* Removed audio elements */}
     </>
   );
 };
