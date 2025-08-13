@@ -85,27 +85,10 @@ export default {
             height: "0",
           },
         },
-        "scrollMatrix": {
-          from: { "background-position": "0 0" },
-          to: { "background-position": "0 100%" },
-        },
-        "drift": {
-          "0%": { transform: "translateY(0)", opacity: "0.08" },
-          "50%": { opacity: "0.3" },
-          "100%": { transform: "translateY(100vh)", opacity: "0" },
-        },
-        "pulse": {
-          "0%": { transform: "translate(-50%, -50%) scale(1)", opacity: "0.6" },
-          "50%": { transform: "translate(-50%, -50%) scale(1.1)", opacity: "1" },
-          "100%": { transform: "translate(-50%, -50%) scale(1)", opacity: "0.6" },
-        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "scrollMatrix": "scrollMatrix 1.6s linear infinite",
-        "drift": "drift 2s infinite linear",
-        "pulse": "pulse 4s infinite ease-in-out",
       },
     },
   },
