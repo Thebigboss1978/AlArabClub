@@ -99,3 +99,14 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Custom styles for HeroBackground */
+.matrix-background {
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 255, 0, 0.04) 0px,
+    rgba(0, 255, 0, 0.04) 2px,
+    transparent 2px,
+    transparent 4px
+  );
+}
