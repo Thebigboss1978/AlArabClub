@@ -9,6 +9,10 @@ const DottedSphereBackground: React.FC = () => {
   const introSoundRef = useRef<HTMLAudioElement>(null);
   const clickSoundRef = useRef<HTMLAudioElement>(null);
 
+  const getRandomDelay = useCallback(() => {
+    return (Math.floor(Math.random() * 70) + 7) * 1000;
+  }, []);
+
   const [isExploded, setIsExploded] = useState(false);
   const [nextCycle, setNextCycle] = useState(Date.now() + getRandomDelay());
 
@@ -23,10 +27,6 @@ const DottedSphereBackground: React.FC = () => {
     vy: number;
   }
 
-  const getRandomDelay = useCallback(() => {
-    return (Math.floor(Math.random() * 70) + 7) * 1000;
-  }, []);
-
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -36,6 +36,7 @@ const DottedSphereBackground: React.FC = () => {
     let animationFrameId: number;
     let particles: Particle[] = [];
     let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    const fontSize = 10; // Moved fontSize here to be accessible by animate
 
     const initializeCanvas = () => {
       canvas.width = window.innerWidth;
@@ -45,7 +46,7 @@ const DottedSphereBackground: React.FC = () => {
       const radius = 150;
       const symbols = [".", "·", "7", "•", "𓁹"];
       const spacing = 7;
-      const fontSize = 10;
+      // fontSize is now defined outside this function
 
       particles = []; // Clear existing particles on resize/re-init
 
