@@ -49,6 +49,17 @@
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Custom colors from original HTML */
+    --ink: 185 100% 93%; /* #d9f9ff */
+    --muted-text: 170 20% 66%; /* #88c6be */
+    --accent-color: 170 100% 50%; /* #00ffee */
+    --gold-color: 51 100% 62%; /* #ffd700 */
+    --steel-color: 210 5% 16%; /* #2a2a2a */
+    --card-bg: 210 20% 4%; /* #0b0f12 */
+    --card-bg2: 210 20% 5%; /* #0d1014 */
+    --grid-line-color: 170 100% 50%; /* #00ffcc */
+    --glyph-color: 110 100% 50%; /* #39ff14 */
   }
 
   .dark {
@@ -87,6 +98,17 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Custom colors for dark mode (same as light for this theme) */
+    --ink: 185 100% 93%;
+    --muted-text: 170 20% 66%;
+    --accent-color: 170 100% 50%;
+    --gold-color: 51 100% 62%;
+    --steel-color: 210 5% 16%;
+    --card-bg: 210 20% 4%;
+    --card-bg2: 210 20% 5%;
+    --grid-line-color: 170 100% 50%;
+    --glyph-color: 110 100% 50%;
   }
 }
 
@@ -99,7 +121,7 @@
     @apply bg-background text-foreground;
     margin: 0;
     padding: 0;
-    overflow: hidden; /* Crucial for the background effect */
+    overflow-x: hidden; /* Crucial for the background effect */
     background: black; /* Ensure black background */
     font-family: monospace;
   }
@@ -124,6 +146,34 @@
   from { background-position: 0 0; }
   to   { background-position: 0 100%; }
 }
+
+/* Scanlines from original HTML */
+.scanlines {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(0, 255, 180, .04) 0, rgba(0, 255, 180, .04) 2px, transparent 2px, transparent 4px);
+  animation: scan 1.6s linear infinite;
+}
+@keyframes scan {
+  from { background-position: 0 0; }
+  to   { background-position: 0 100%; }
+}
+
+/* Grid background from original HTML */
+.grid-background {
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(circle at 50% 50%, hsl(var(--grid-line-color) / 0.08), transparent 40%),
+                    linear-gradient(hsl(var(--grid-line-color) / 0.06) 1px, transparent 1px),
+                    linear-gradient(90deg, hsl(var(--grid-line-color) / 0.06) 1px, transparent 1px);
+  background-size: 100% 100%, 60px 60px, 60px 60px;
+  background-position: center;
+  z-index: 0;
+  pointer-events: none;
+}
+
 .glyphs {
   position: fixed;
   width: 100%;
@@ -133,7 +183,7 @@
 }
 .glyph {
   position: absolute;
-  color: #39ff14;
+  color: hsl(var(--glyph-color));
   font-size: calc(14px + 0.4vw);
   opacity: 0.06;
   animation: drift 2s infinite linear;
@@ -148,18 +198,18 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: calc(6vw + 12px);
-  color: #00ffcc;
+  font-size: clamp(56px,7vw,140px);
+  color: hsl(var(--accent-color));
   text-shadow:
-    0 0 10px #00ffee,
-    0 0 20px #00ffee,
-    0 0 40px #00ffee;
+    0 0 14px hsl(var(--accent-color)),
+    0 0 36px hsl(var(--accent-color));
   animation: pulse 4s infinite ease-in-out;
   z-index: 2;
-  pointer-events: none;
+  user-select: none;
+  pointer-events: none; /* Ensure it doesn't block clicks on the canvas */
 }
 @keyframes pulse {
   0%   { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
-  50%  { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+  50%  { transform: translate(-50%, -50%) scale(1.08); opacity: 1; }
   100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
 }

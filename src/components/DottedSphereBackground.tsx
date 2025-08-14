@@ -2,10 +2,12 @@
 
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 
-const DottedSphereBackground: React.FC = () => {
+interface DottedSphereBackgroundProps {
+  onSphereClick: () => void;
+}
+
+const DottedSphereBackground: React.FC<DottedSphereBackgroundProps> = ({ onSphereClick }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const glyphsContainerRef = useRef<HTMLDivElement>(null);
-  const eyeRef = useRef<HTMLDivElement>(null); // Keep eyeRef as it's used for visual feedback
 
   const getRandomDelay = useCallback(() => {
     return (Math.floor(Math.random() * 70) + 7) * 1000;
@@ -40,7 +42,6 @@ const DottedSphereBackground: React.FC = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
 
-      // Add check for zero dimensions
       if (canvas.width === 0 || canvas.height === 0) {
         console.warn("Canvas dimensions are zero, skipping initialization.");
         return;
@@ -121,13 +122,7 @@ const DottedSphereBackground: React.FC = () => {
       const dy = e.clientY - centerY;
       if (Math.sqrt(dx * dx + dy * dy) < radius) {
         explodeParticles();
-        // Removed click sound playback
-        if (eyeRef.current) {
-          eyeRef.current.style.left = "55%";
-          setTimeout(() => {
-            if (eyeRef.current) eyeRef.current.style.left = "50%";
-          }, 1000);
-        }
+        onSphereClick(); // Notify parent about the click
       }
     };
     canvas.addEventListener("click", handleClick);
@@ -171,40 +166,16 @@ const DottedSphereBackground: React.FC = () => {
     };
     animate();
 
-    // Glyphs generation
-    const glyphs = "𓂀𓏏𓆣𓋹𓉐𓄿𓇳𓎛𓈖𓃭𓍯𓊃𓊪𓃾𓈎𓅱𓅓𓃀𓇋𓍿𓐍𓊽𓌳𓋴𓇯𓏠𓉔𓁷ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*()_+{}[]|\\/~?><!-=:,.αβγδεζηθικλμνξοπρστυφχψωАБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЮЯشعرابشيخفجثجظرزسضطىةءؤإأآ✓∞≠±∑∂∆µπ⊕⊗⊙⊥∩∪∈∉∀∃√∛☥☯☸  ⚛🔥✨🌌💫S⋄A⋄L⋄S⋄";
-    const container = glyphsContainerRef.current;
-    if (container) {
-      container.innerHTML = '';
-      for (let i = 0; i < 200; i++) {
-        const glyph = document.createElement("div");
-        glyph.className = "glyph";
-        glyph.style.left = `${Math.random() * 100}%`;
-        glyph.style.top = `-${Math.random() * 100}%`;
-        glyph.style.animationDelay = `${Math.random() * 2}s`;
-        glyph.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
-        container.appendChild(glyph);
-      }
-    }
-
-    // Removed handleFirstClick and associated event listener
-
     return () => {
       window.removeEventListener('resize', handleResize);
       canvas.removeEventListener("mousemove", handleMouseMove);
       canvas.removeEventListener("click", handleClick);
       cancelAnimationFrame(animationFrameId);
     };
-  }, [isExploded, nextCycle, getRandomDelay]);
+  }, [isExploded, nextCycle, getRandomDelay, onSphereClick]);
 
   return (
-    <>
-      <div className="matrix-background"></div>
-      <div className="glyphs" ref={glyphsContainerRef}></div>
-      <div className="eye-container" ref={eyeRef}>𓁹</div>
-      <canvas id="canvas" ref={canvasRef} className="absolute top-0 left-0 block"></canvas>
-      {/* Removed audio elements */}
-    </>
+    <canvas id="canvas" ref={canvasRef} className="absolute top-0 left-0 block"></canvas>
   );
 };
 
