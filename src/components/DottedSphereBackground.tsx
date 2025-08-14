@@ -5,14 +5,17 @@ import React, { useRef, useEffect, useState, useCallback } from 'react';
 const DottedSphereBackground: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glyphsContainerRef = useRef<HTMLDivElement>(null);
-  const eyeRef = useRef<HTMLDivElement>(null); // Keep eyeRef as it's used for visual feedback
+  const eyeRef = useRef<HTMLDivElement>(null);
+  const introSoundRef = useRef<HTMLAudioElement>(null);
+  const clickSoundRef = useRef<HTMLAudioElement>(null);
 
   const getRandomDelay = useCallback(() => {
-    return (Math.floor(Math.random() * 70) + 7) * 1000;
+    return (Math.floor(Math.random() * 12) + 14) * 1000; // 14-26 seconds
   }, []);
 
   const [isExploded, setIsExploded] = useState(false);
   const [nextCycle, setNextCycle] = useState(Date.now() + getRandomDelay());
+  const [hasInteracted, setHasInteracted] = useState(false);
 
   interface Particle {
     x: number;
@@ -40,7 +43,6 @@ const DottedSphereBackground: React.FC = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
 
-      // Add check for zero dimensions
       if (canvas.width === 0 || canvas.height === 0) {
         console.warn("Canvas dimensions are zero, skipping initialization.");
         return;
@@ -114,6 +116,14 @@ const DottedSphereBackground: React.FC = () => {
     canvas.addEventListener("mousemove", handleMouseMove);
 
     const handleClick = (e: MouseEvent) => {
+      if (!hasInteracted) {
+        setHasInteracted(true);
+        if (introSoundRef.current) {
+          introSoundRef.current.currentTime = 0;
+          introSoundRef.current.play().catch(err => console.error("Error playing intro sound:", err));
+        }
+      }
+
       const centerX = canvas.width / 2;
       const centerY = canvas.height / 2;
       const radius = 150;
@@ -121,7 +131,10 @@ const DottedSphereBackground: React.FC = () => {
       const dy = e.clientY - centerY;
       if (Math.sqrt(dx * dx + dy * dy) < radius) {
         explodeParticles();
-        // Removed click sound playback
+        if (clickSoundRef.current) {
+          clickSoundRef.current.currentTime = 0;
+          clickSoundRef.current.play().catch(err => console.error("Error playing click sound:", err));
+        }
         if (eyeRef.current) {
           eyeRef.current.style.left = "55%";
           setTimeout(() => {
@@ -138,6 +151,7 @@ const DottedSphereBackground: React.FC = () => {
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
+      // Auto explode/regroup logic
       if (Date.now() > nextCycle) {
         if (!isExploded) explodeParticles();
         else regroupParticles();
@@ -187,23 +201,25 @@ const DottedSphereBackground: React.FC = () => {
       }
     }
 
-    // Removed handleFirstClick and associated event listener
-
     return () => {
       window.removeEventListener('resize', handleResize);
       canvas.removeEventListener("mousemove", handleMouseMove);
       canvas.removeEventListener("click", handleClick);
       cancelAnimationFrame(animationFrameId);
     };
-  }, [isExploded, nextCycle, getRandomDelay]);
+  }, [isExploded, nextCycle, getRandomDelay, hasInteracted]);
 
   return (
     <>
+      <div className="scanlines"></div>
+      <div className="grid"></div>
       <div className="matrix-background"></div>
       <div className="glyphs" ref={glyphsContainerRef}></div>
       <div className="eye-container" ref={eyeRef}>𓁹</div>
       <canvas id="canvas" ref={canvasRef} className="absolute top-0 left-0 block"></canvas>
-      {/* Removed audio elements */}
+      {/* Audio elements */}
+      <audio id="introSound" src="https://alarabclub777.vercel.app/sounds/intro.mp3" preload="auto" ref={introSoundRef}></audio>
+      <audio id="clickSound" src="https://alarabclub777.vercel.app/sounds/click.mp3" preload="auto" ref={clickSoundRef}></audio>
     </>
   );
 };
