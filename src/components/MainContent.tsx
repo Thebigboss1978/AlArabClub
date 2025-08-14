@@ -2,9 +2,25 @@
 
 import React, { useEffect, useRef } from 'react';
 import { showSuccess, showError } from '@/utils/toast'; // Import toast utilities
+import { useIsMobile } from '@/hooks/use-mobile'; // Import the useIsMobile hook
+import MobileNav from './MobileNav'; // Import the new MobileNav component
 
 const MainContent: React.FC = () => {
   const sectionRefs = useRef<(HTMLElement | null)[]>([]);
+  const isMobile = useIsMobile(); // Use the hook to determine if it's a mobile device
+
+  const navLinks = [
+    { href: "#safari", label: "Safari" },
+    { href: "#temples", label: "Temples" },
+    { href: "#nile", label: "Nile" },
+    { href: "#spirit", label: "Spirit Portal" },
+    { href: "#archives", label: "Archives" },
+    { href: "#workshops", label: "Workshops" },
+    { href: "#merch", label: "Merch" },
+    { href: "#matrix777", label: "Matrix777" },
+    { href: "#meta", label: "Meta" },
+    { href: "#contact", label: "Contact" },
+  ];
 
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
@@ -46,16 +62,17 @@ const MainContent: React.FC = () => {
       <header className="fixed top-0 left-0 right-0 z-50 bg-black bg-opacity-60 backdrop-blur-md border-b border-green-500">
         <nav className="flex items-center gap-3 p-2 md:p-4">
           <div className="font-extrabold tracking-wider text-gold-500 text-lg md:text-xl">𓁹 AlArab 5D</div>
-          <a href="#safari" className="nav-link">Safari</a>
-          <a href="#temples" className="nav-link">Temples</a>
-          <a href="#nile" className="nav-link">Nile</a>
-          <a href="#spirit" className="nav-link">Spirit Portal</a>
-          <a href="#archives" className="nav-link">Archives</a>
-          <a href="#workshops" className="nav-link">Workshops</a>
-          <a href="#merch" className="nav-link">Merch</a>
-          <a href="#matrix777" className="nav-link">Matrix777</a>
-          <a href="#meta" className="nav-link">Meta</a>
-          <a href="#contact" className="nav-link">Contact</a>
+          {isMobile ? (
+            <MobileNav navLinks={navLinks} />
+          ) : (
+            <div className="hidden md:flex items-center gap-3">
+              {navLinks.map((link) => (
+                <a key={link.href} href={link.href} className="nav-link">
+                  {link.label}
+                </a>
+              ))}
+            </div>
+          )}
         </nav>
       </header>
 
