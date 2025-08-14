@@ -39,6 +39,13 @@ const DottedSphereBackground: React.FC = () => {
     const initializeCanvas = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+
+      // Add check for zero dimensions
+      if (canvas.width === 0 || canvas.height === 0) {
+        console.warn("Canvas dimensions are zero, skipping initialization.");
+        return;
+      }
+
       const centerX = canvas.width / 2;
       const centerY = canvas.height / 2;
       const radius = 150;
@@ -57,11 +64,11 @@ const DottedSphereBackground: React.FC = () => {
         offCtx.beginPath();
         offCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
         offCtx.fill();
-        const imageData = offCtx.getImageData(0, 0, canvas.width, canvas.height);
+        const imageData = offCtx.getImageData(0, 0, offCanvas.width, offCanvas.height);
 
-        for (let y = 0; y < canvas.height; y += spacing) {
-          for (let x = 0; x < canvas.width; x += spacing) {
-            const i = (y * canvas.width + x) * 4;
+        for (let y = 0; y < offCanvas.height; y += spacing) {
+          for (let x = 0; x < offCanvas.width; x += spacing) {
+            const i = (y * offCanvas.width + x) * 4;
             if (imageData.data[i + 3] > 128) {
               particles.push({
                 x,
