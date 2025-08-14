@@ -51,8 +51,13 @@ const MainContent: React.FC = () => {
 
       <main className="relative z-20 pt-[60px]"> {/* Added padding-top to account for fixed header */}
         {/* HERO section - The visual is handled by DottedSphereBackground, only text content here */}
-        <section id="hero" className="min-h-screen flex items-center justify-center pt-14">
-          {/* The eye and HUD are now part of DottedSphereBackground or Index.tsx */}
+        <section id="hero" className="min-h-screen flex flex-col items-center justify-center text-center pt-14 px-4">
+          <h1 className="text-5xl md:text-7xl font-extrabold text-gold-500 mb-4 drop-shadow-lg">
+            AlArab Club 777
+          </h1>
+          <p className="text-xl md:text-2xl text-blue-300 max-w-2xl opacity-90">
+            بوابة الروح · Cyber-Egyptian Experience
+          </p>
         </section>
 
         {/* 01_safari_𓃰 Desert Adventures */}
