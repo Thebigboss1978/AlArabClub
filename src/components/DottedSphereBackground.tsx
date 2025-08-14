@@ -186,7 +186,7 @@ const DottedSphereBackground: React.FC = () => {
     animate();
 
     // Glyphs generation
-    const glyphs = "𓂀𓏏𓆣𓋹𓉐𓄿𓇳𓎛𓈖𓃭𓍯𓊃𓊪𓃾𓈎𓅱𓅓𓃀𓇋𓍿𓐍𓊽𓌳𓋴𓇯𓏠𓉔𓁷ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*()_+{}[]|\\/~?><!-=:,.αβγδεζηθικλμνξοπρστυφχψωАБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЮЯشعرابشيخفجثجظرزسضطىةءؤإأآ✓∞≠±∑∂∆µπ⊕⊗⊙⊥∩∪∈∉∀∃√∛☥☯☸  ⚛🔥✨🌌💫S⋄A⋄L⋄S⋄";
+    const glyphs = "𓂀𓏏𓆣𓋹𓉐𓄿𓇳𓎛𓈖𓃭𓍯𓊃𓊪𓃾𓈎𓅱𓅓𓃀𓇋𓍿𓐍𓊽𓌳𓋴𓇯𓏠𓉔𓁷ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*()_+{}[]|\\/~?><!-=:,.αβγδεζηθικλμνξοπρστυφχψωАБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЮЯشعرابشيخفجثجظرزسضطىةءؤإأآ✓∞≠±∑∂∆µπ⊕⊗⊙⊥∩∪∈∉∀∃√∛☥☯☸  ⚛🔥✨🌌💫S⋄A⋄L⋄";
     const container = glyphsContainerRef.current;
     if (container) {
       container.innerHTML = '';
@@ -218,8 +218,8 @@ const DottedSphereBackground: React.FC = () => {
       <div className="eye-container" ref={eyeRef}>𓁹</div>
       <canvas id="canvas" ref={canvasRef} className="absolute top-0 left-0 block"></canvas>
       {/* Audio elements */}
-      <audio id="introSound" src="https://alarabclub777.vercel.app/sounds/intro.mp3" preload="auto" ref={introSoundRef}></audio>
-      <audio id="clickSound" src="https://alarabclub777.vercel.app/sounds/click.mp3" preload="auto" ref={clickSoundRef}></audio>
+      <audio id="introSound" src="/sounds/intro.mp3" preload="auto" ref={introSoundRef}></audio>
+      <audio id="clickSound" src="/sounds/click.mp3" preload="auto" ref={clickSoundRef}></audio>
     </>
   );
 };
