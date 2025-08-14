@@ -1,0 +1,248 @@
+<!-- AlArab 5D Site – Full Single-File Scaffold
+     Tech: Pure HTML + CSS + Vanilla JS (+ optional Three.js for the hero portal)
+     Style: Cyber-Egyptian • Matrix glyph rain • Dotted Sphere Portal • RTL-friendly
+     Notes: Replace placeholder text/images per section. Minimal deps, fast to host anywhere.
+-->
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AlArab 5D – Pharaonic Spirit Portal</title>
+  <style>
+    :root {
+      --bg: #000; --ink: #d9f9ff; --muted:#88c6be; --accent:#00ffee; --gold:#ffd700; --steel:#2a2a2a;
+      --card:#0b0f12; --card2:#0d1014; --grid: rgba(0,255,200,0.06);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:ui-monospace,Menlo,Consolas,monospace;scroll-behavior:smooth}
+    a{color:var(--accent);text-decoration:none}
+    .scanlines{position:fixed;inset:0;z-index:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,255,180,.04)0,rgba(0,255,180,.04)2px,transparent 2px,transparent 4px);animation:scan 1.6s linear infinite}
+    @keyframes scan{from{background-position:0 0}to{background-position:0 100%}}
+    .grid{position:fixed;inset:0;background-image:radial-gradient(circle at 50% 50%,rgba(0,255,200,.08),transparent 40%),linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:100% 100%, 60px 60px, 60px 60px;background-position:center;z-index:0;pointer-events:none}
+    /* NAV */
+    header{position:fixed;top:0;left:0;right:0;z-index:10;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);border-bottom:1px solid #0f2;}
+    .nav{display:flex;align-items:center;gap:12px;padding:10px 16px;}
+    .brand{font-weight:800;letter-spacing:.6px;color:var(--gold)}
+    .nav a{padding:8px 10px;border:1px solid rgba(0,255,180,.18);border-radius:12px}
+    .nav a:hover{background:rgba(0,255,180,.07)}
+    /* HERO */
+    .hero{position:relative;min-height:100vh;display:grid;place-items:center;padding-top:54px}
+    #stage{position:absolute;inset:0;z-index:1}
+    .eye{position:relative;z-index:2;font-size:clamp(56px,7vw,140px);color:var(--accent);text-shadow:0 0 14px #0ff,0 0 36px #0ff;animation:pulse 4s ease-in-out infinite;user-select:none}
+    @keyframes pulse{0%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.08)}100%{opacity:.6;transform:scale(1)}}
+    .hero-hud{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);z-index:3;font-size:12px;color:var(--muted);}
+    /* SECTIONS */
+    main{position:relative;z-index:2}
+    section{padding:72px 18px;max-width:1100px;margin:0 auto;border-top:1px solid rgba(0,255,180,.12)}
+    .title{display:flex;align-items:center;gap:8px;font-weight:900;color:var(--gold);font-size:clamp(20px,2.4vw,28px);margin:0 0 10px}
+    .slug{color:var(--muted);font-size:12px}
+    .kicker{color:#9be;opacity:.9;margin:6px 0 14px}
+    .cards{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+    .card{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid rgba(0,255,180,.18);border-radius:18px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    .card h4{margin:0 0 6px;color:#dff}
+    .pill{display:inline-flex;gap:6px;align-items:center;border:1px solid rgba(255,215,0,.3);border-radius:999px;padding:4px 10px;color:var(--gold);font-size:12px}
+    .muted{opacity:.75}
+    .cta{display:inline-block;margin-top:10px;padding:10px 14px;border-radius:14px;background:rgba(0,255,200,.1);border:1px solid rgba(0,255,200,.25)}
+    /* Reveal */
+    .reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease, transform .6s ease}
+    .reveal.active{opacity:1;transform:none}
+    /* Footer */
+    footer{padding:60px 16px;border-top:1px solid rgba(0,255,180,.12);text-align:center;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="scanlines"></div>
+  <div class="grid"></div>
+  <header>
+    <nav class="nav">
+      <div class="brand">𓁹 AlArab 5D</div>
+      <a href="#safari">Safari</a>
+      <a href="#temples">Temples</a>
+      <a href="#nile">Nile</a>
+      <a href="#spirit">Spirit Portal</a>
+      <a href="#archives">Archives</a>
+      <a href="#workshops">Workshops</a>
+      <a href="#merch">Merch</a>
+      <a href="#matrix777">Matrix777</a>
+      <a href="#meta">Meta</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <!-- HERO: 3D dotted sphere portal (optional Three.js). Works fine even if the script fails -->
+  <section class="hero" id="hero">
+    <div id="stage" aria-hidden="true"></div>
+    <div class="eye" title="Eye of Horus">𓁹</div>
+    <div class="hero-hud">انقر للتفجير/التجميع · حرّك الفأرة للدوران</div>
+  </section>
+
+  <main>
+    <!-- 01_safari_𓃰 Desert Adventures -->
+    <section id="safari" class="reveal">
+      <h2 class="title">01_𓃰 سفاري الصحراء <span class="slug">/ Desert Adventures</span></h2>
+      <p class="kicker">انطلق في رحلة لا تُنسى إلى قلب الصحراء العربية — 4x4، جمال، و Quad Bikes — وانغمس في روح الرمال القديمة.</p>
+      <div class="cards">
+        <article class="card"><h4>4x4 Dune Bashing</h4><p class="muted">جولات طوفان على الكثبان الذهبية مع توقفات للتصوير والغروب.</p><span class="pill">60–120 دقيقة</span></article>
+        <article class="card"><h4>Camel Trek</h4><p class="muted">نزول ناعم لنبض الصحراء على ظهر الجمل، قهوة عربية وتمور.</p><span class="pill">مسار قصير/طويل</span></article>
+        <article class="card"><h4>Quad Sprint</h4><p class="muted">دراجات رباعية بسرعة مضبوطة ومسار آمن للمبتدئ والمحترف.</p><span class="pill">معدات متوفرة</span></article>
+      </div>
+      <a class="cta" href="#spirit">ادخل البوابة الروحية →</a>
+    </section>
+
+    <!-- 02_temples_𓉐 Sacred Sites -->
+    <section id="temples" class="reveal">
+      <h2 class="title">02_𓉐 المعابد المقدسة <span class="slug">/ Sacred Sites</span></h2>
+      <p class="kicker">رحلات منسّقة إلى المعابد والأهرام، مع سرد أسطوري وإسقاطات ضوئية ليلية.</p>
+      <div class="cards">
+        <article class="card"><h4>Luxor & Karnak</h4><p class="muted">ممرات الأعمدة وصدى النقوش — مسار تاريخي تفاعلي.</p><span class="pill">جولة نهارية/ليلية</span></article>
+        <article class="card"><h4>Giza Horizon</h4><p class="muted">أفق الجيزة مع عرض ليزري خفيف يشرح محاور النجوم.</p><span class="pill">+ انتقال VR</span></article>
+        <article class="card"><h4>Saqqara Layers</h4><p class="muted">طبقات العمارة من زوسر حتى الأسرات الحديثة.</p><span class="pill">دليل ثنائي اللغة</span></article>
+      </div>
+    </section>
+
+    <!-- 03_nile_𓇳 River & Feluccas -->
+    <section id="nile" class="reveal">
+      <h2 class="title">03_𓇳 النيل والفلّوكات <span class="slug">/ River Journeys</span></h2>
+      <p class="kicker">رحلات نهرية هادئة، موسيقى عود حيّة، وموائد تقليدية على سطح المركب.</p>
+      <div class="cards">
+        <article class="card"><h4>Sunset Felucca</h4><p class="muted">خط الأفق يلمع، والرياح تدفعك نحو الحلم.</p><span class="pill">90 دقيقة</span></article>
+        <article class="card"><h4>Nubian Nights</h4><p class="muted">ألوان النوبة وأغانيها على صفحة ماء ساكن.</p><span class="pill">أصالة × فن</span></article>
+      </div>
+    </section>
+
+    <!-- 04_spirit_portal_𓂀 -->
+    <section id="spirit" class="reveal">
+      <h2 class="title">04_𓂀 البوابة الروحية <span class="slug">/ Spirit Portal</span></h2>
+      <p class="kicker">بوابة تزامن بين الرمز والهندسة — اختبر الوعي كمسار ملاحي، لا كنقطة وصول.</p>
+      <div class="cards">
+        <article class="card"><h4>Ritual Mode</h4><p class="muted">تتابع خطوات سمعي/بصري — يفتح حالات جديدة في الواجهة.</p><span class="pill">Unlockables</span></article>
+        <article class="card"><h4>Soul GPT</h4><p class="muted">حوار مرمّز يعتمد السياق الرمزي للهُوية البصرية.</p><span class="pill">Context-aware</span></article>
+      </div>
+      <a class="cta" href="#matrix777">اذهب إلى Matrix777 →</a>
+    </section>
+
+    <!-- 05_archives_𓏠 Digital Archives -->
+    <section id="archives" class="reveal">
+      <h2 class="title">05_𓏠 الأرشيف الرقمي <span class="slug">/ Digital Archives</span></h2>
+      <p class="kicker">أطالس، مخططات، وخرائط نجميّة — قابل للبحث والتوسّع.</p>
+      <div class="cards">
+        <article class="card"><h4>Codex</h4><p class="muted">دفتر شفرات وصيغ رسمية للمخطوط البصري.</p><span class="pill">PDF/JSON</span></article>
+        <article class="card"><h4>Media Vault</h4><p class="muted">صور عالية الدقة، فيديوهات، ولقطات 360°.</p><span class="pill">Rights-ready</span></article>
+      </div>
+    </section>
+
+    <!-- 06_workshops_𓌳 -->
+    <section id="workshops" class="reveal">
+      <h2 class="title">06_𓌳 الورش والطقوس <span class="slug">/ Workshops</span></h2>
+      <p class="kicker">جلسات حيّة: نقش، موسيقى، لغة هيروغليفية، وتجارب تفاعلية.</p>
+      <div class="cards">
+        <article class="card"><h4>Hieroglyph 101</h4><p class="muted">أبجدية الرموز والاتصال البصري.</p><span class="pill">Starter</span></article>
+        <article class="card"><h4>Sound Bath</h4><p class="muted"> مجالات ترددية تنظّف الشاشة الداخلية.</p><span class="pill">Binaural</span></article>
+      </div>
+    </section>
+
+    <!-- 07_merch_𓋹 -->
+    <section id="merch" class="reveal">
+      <h2 class="title">07_𓋹 المتجر <span class="slug">/ Merch</span></h2>
+      <p class="kicker">أقنعة، تمائم، وطبعات فنية — شحن عالمي.</p>
+      <div class="cards">
+        <article class="card"><h4>Sigil Masks</h4><p class="muted">أقنعة طقسية قابلة للتخصيص.</p><span class="pill">Made-to-order</span></article>
+        <article class="card"><h4>Glyph Prints</h4><p class="muted">طبعات معدنية بإضاءة خفيفة.</p><span class="pill">A3/A2</span></article>
+      </div>
+    </section>
+
+    <!-- 08_matrix777_⋄ -->
+    <section id="matrix777" class="reveal">
+      <h2 class="title">08_⋄ Matrix777 <span class="slug">/ Signal Grid</span></h2>
+      <p class="kicker">شبكة تزامن — لوحات قياس طاقة/إلهام — تُحدّث آليًا.</p>
+      <div class="cards">
+        <article class="card"><h4>Resonance Map</h4><p class="muted">خرائط ديناميكية للنشاط.</p><span class="pill">Live</span></article>
+        <article class="card"><h4>Key 7:7:7</h4><p class="muted">بوابات أرقام وإشارات.</p><span class="pill">Rotating</span></article>
+      </div>
+    </section>
+
+    <!-- 09_meta_☥ System & Lore -->
+    <section id="meta" class="reveal">
+      <h2 class="title">09_☥ الميتا <span class="slug">/ System & Lore</span></h2>
+      <p class="kicker">شرح الفلسفة، هندسة المعلومات، ومخطط الهوية البصرية.</p>
+      <div class="cards">
+        <article class="card"><h4>Design System</h4><p class="muted">الألوان، الشبكات، المكوّنات، القواعد.</p><span class="pill">Figma spec</span></article>
+        <article class="card"><h4>Mythos</h4><p class="muted">السرد المؤسِّس وأصله.</p><span class="pill">Canon</span></article>
+      </div>
+    </section>
+
+    <!-- 10_contact_✉ -->
+    <section id="contact" class="reveal">
+      <h2 class="title">10_✉ تواصل <span class="slug">/ Contact</span></h2>
+      <p class="kicker">ارسل إشارتك. سنعود إليك بسرعة الضوء.</p>
+      <form class="card" onsubmit="event.preventDefault(); alert('تم الإرسال (Placeholder)');">
+        <label>الاسم<br><input required type="text" style="width:100%;padding:10px;border-radius:10px;border:1px solid #0a5;background:#020607;color:#cfe"></label>
+        <br><br>
+        <label>البريد<br><input required type="email" style="width:100%;padding:10px;border-radius:10px;border:1px solid #0a5;background:#020607;color:#cfe"></label>
+        <br><br>
+        <label>الرسالة<br><textarea required rows="5" style="width:100%;padding:10px;border-radius:10px;border:1px solid #0a5;background:#020607;color:#cfe"></textarea></label>
+        <br>
+        <button class="cta" type="submit">إرسال</button>
+      </form>
+    </section>
+  </main>
+
+  <footer>© AlArab 5D — بوابة الروح · Cyber-Egyptian Experience</footer>
+
+  <!-- Optional audio -->
+  <audio id="introSound" src="https://alarabclub777.vercel.app/sounds/intro.mp3" preload="auto"></audio>
+  <audio id="clickSound" src="https://alarabclub777.vercel.app/sounds/click.mp3" preload="auto"></audio>
+
+  <!-- Optional: Three.js for hero only -->
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+  <script>
+    // ===== Section reveal on scroll =====
+    const observer = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('active'); });
+    }, {threshold: .12});
+    document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+    // ===== Hero 3D dotted sphere (same spirit, lighter count) =====
+    const stage = document.getElementById('stage');
+    let hasAudio=false, exploded=false;
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(55, window.innerWidth/window.innerHeight, 0.1, 2000);
+    camera.position.set(0,0,420);
+    const renderer = new THREE.WebGLRenderer({antialias:true,alpha:true});
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(2, window.devicePixelRatio));
+    stage.appendChild(renderer.domElement);
+
+    const light = new THREE.PointLight(0x22ffff, 1.1, 1400); light.position.set(0,0,400); scene.add(light);
+    const back = new THREE.PointLight(0x886600, 0.7, 1400); back.position.set(0,0,-400); scene.add(back);
+
+    function fibonacciSphere(n, r){ const pts=[]; const phi=Math.PI*(3-Math.sqrt(5)); for(let i=0;i<n;i++){ const y=1-(i/(n-1))*2; const rr=Math.sqrt(1-y*y); const th=phi*i; const x=Math.cos(th)*rr; const z=Math.sin(th)*rr; pts.push(new THREE.Vector3(x*r,y*r,z*r)); } return pts; }
+
+    const R=150, N=2200; const base=fibonacciSphere(N,R);
+    const geo=new THREE.BufferGeometry(); const pos=new Float32Array(N*3); const vel=new Float32Array(N*3);
+    for(let i=0;i<N;i++){ pos[i*3]=base[i].x; pos[i*3+1]=base[i].y; pos[i*3+2]=base[i].z; }
+    geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
+    const mat=new THREE.PointsMaterial({ size:2.2, transparent:true, opacity:.95, depthWrite:false, blending:THREE.AdditiveBlending, color:0xffd700 });
+    const dotSphere=new THREE.Points(geo,mat); scene.add(dotSphere);
+
+    const ring=new THREE.Mesh(new THREE.RingGeometry(R*.84,R*.9,128), new THREE.MeshBasicMaterial({color:0x00ffee,transparent:true,opacity:.2,side:THREE.DoubleSide,blending:THREE.AdditiveBlending}));
+    ring.position.z=-1; scene.add(ring);
+
+    let tRX=0, tRY=0; window.addEventListener('mousemove', (e)=>{ const nx=(e.clientX/window.innerWidth)*2-1; const ny=(e.clientY/window.innerHeight)*2-1; tRY=nx*.6; tRX=-ny*.6; });
+
+    function explode(){ for(let i=0;i<N;i++){ const bx=base[i].x, by=base[i].y, bz=base[i].z; const len=Math.max(1, Math.hypot(bx,by,bz)); const nx=bx/len, ny=by/len, nz=bz/len; const p=60+Math.random()*90; vel[i*3]+=nx*p; vel[i*3+1]+=ny*p; vel[i*3+2]+=nz*p; } exploded=true; ring.material.opacity=.35; try{document.getElementById('clickSound').currentTime=0; document.getElementById('clickSound').play();}catch{} }
+    function regroup(){ exploded=false; ring.material.opacity=.2; }
+
+    renderer.domElement.addEventListener('click', ()=>{ if(!hasAudio){ hasAudio=true; try{const a=document.getElementById('introSound'); a.currentTime=0; a.play();}catch{} } exploded?regroup():explode(); });
+
+    const DAMP=.965, RETURN=.06, MAX=R*5; function tick(){ requestAnimationFrame(tick); dotSphere.rotation.x+=(tRX-dotSphere.rotation.x)*.05; dotSphere.rotation.y+=(tRY-dotSphere.rotation.y)*.05; ring.rotation.y=dotSphere.rotation.y*.4; const arr=geo.attributes.position.array; for(let i=0;i<N;i++){ const ix=i*3; const bx=base[i].x, by=base[i].y, bz=base[i].z; const dx=bx-arr[ix]; const dy=by-arr[ix+1]; const dz=bz-arr[ix+2]; vel[ix]+=dx*RETURN; vel[ix+1]+=dy*RETURN; vel[ix+2]+=dz*RETURN; vel[ix]*=DAMP; vel[ix+1]*=DAMP; vel[ix+2]*=DAMP; arr[ix]+=vel[ix]*.016; arr[ix+1]+=vel[ix+1]*.016; arr[ix+2]+=vel[ix+2]*.016; const L=Math.hypot(arr[ix],arr[ix+1],arr[ix+2]); if(L>MAX){ arr[ix]=bx; arr[ix+1]=by; arr[ix+2]=bz; vel[ix]=vel[ix+1]=vel[ix+2]=0; } } geo.attributes.position.needsUpdate=true; dotSphere.rotation.y+=.002; renderer.render(scene,camera); }
+    tick();
+
+    window.addEventListener('resize', ()=>{ camera.aspect=window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
+
+    // Optional: auto explode/regroup every 14–26s
+    let next=Date.now()+(14+Math.random()*12)*1000; setInterval(()=>{ const now=Date.now(); if(now>next){ exploded?regroup():explode(); next=now+(14+Math.random()*12)*1000; } }, 1000);
+  </script>
+</body>
+</html>

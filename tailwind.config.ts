@@ -62,16 +62,6 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        // Custom colors from original HTML
-        ink: "hsl(var(--ink))",
-        "muted-text": "hsl(var(--muted-text))",
-        "accent-color": "hsl(var(--accent-color))",
-        "gold-color": "hsl(var(--gold-color))",
-        "steel-color": "hsl(var(--steel-color))",
-        "card-bg": "hsl(var(--card-bg))",
-        "card-bg2": "hsl(var(--card-bg2))",
-        "grid-line-color": "hsl(var(--grid-line-color))",
-        "glyph-color": "hsl(var(--glyph-color))",
       },
       borderRadius: {
         lg: "var(--radius)",
