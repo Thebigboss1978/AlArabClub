@@ -62,6 +62,25 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Custom colors from index-standalone.html
+        ink: {
+          500: '#d9f9ff',
+        },
+        gold: {
+          500: '#ffd700',
+        },
+        steel: {
+          900: '#2a2a2a',
+        },
+        blue: {
+          300: '#9be', // Kicker color
+          200: '#dff', // Card h4 color
+        },
+        green: {
+          500: '#00ffee', // Accent color for borders/CTAs
+          600: '#0a5', // Form border color
+          200: '#cfe', // Form text color
+        }
       },
       borderRadius: {
         lg: "var(--radius)",
