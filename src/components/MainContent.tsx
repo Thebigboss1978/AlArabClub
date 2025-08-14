@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef } from 'react';
+import { showSuccess, showError } from '@/utils/toast'; // Import toast utilities
 
 const MainContent: React.FC = () => {
   const sectionRefs = useRef<(HTMLElement | null)[]>([]);
@@ -29,6 +30,15 @@ const MainContent: React.FC = () => {
     if (el && !sectionRefs.current.includes(el)) {
       sectionRefs.current.push(el);
     }
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // In a real application, you would send this data to a backend.
+    // For now, we'll just show a success toast.
+    showSuccess('تم إرسال رسالتك بنجاح!');
+    // Optionally, clear the form fields
+    e.currentTarget.reset();
   };
 
   return (
@@ -158,7 +168,7 @@ const MainContent: React.FC = () => {
         <section id="contact" ref={addSectionRef} className="reveal py-18 px-4 max-w-screen-xl mx-auto border-t border-green-500 border-opacity-30">
           <h2 className="flex items-center gap-2 font-black text-gold-500 text-2xl md:text-3xl mb-2">10_✉ تواصل <span className="text-muted-foreground text-sm">/ Contact</span></h2>
           <p className="text-blue-300 opacity-90 mb-4">ارسل إشارتك. سنعود إليك بسرعة الضوء.</p>
-          <form className="card p-4" onSubmit={(e) => { e.preventDefault(); alert('تم الإرسال (Placeholder)'); }}>
+          <form className="card p-4" onSubmit={handleSubmit}>
             <label className="block mb-4">
               <span className="text-ink-500">الاسم</span><br/>
               <input required type="text" className="w-full p-2 rounded-md border border-green-600 bg-gray-950 text-green-200 mt-1" />
