@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galaxy Project Manager Portal — AlArabClub777</title>
+<style>
+/* Global */
+body{margin:0;font-family:'Segoe UI',sans-serif;background:#000;color:#fff;overflow:hidden;}
+header{position:absolute;top:0;left:0;width:100%;padding:10px 20px;backdrop-filter:blur(12px) saturate(180%);background:rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.2);z-index:10;display:flex;justify-content:space-between;align-items:center;}
+header h1{font-size:1.2rem;margin:0;}
+.toolbar select, .toolbar button, .toolbar input{margin:0 5px;padding:5px;border-radius:8px;border:none;backdrop-filter:blur(8px);background:rgba(255,255,255,.1);color:#fff;}
+
+/* Canvas */
+canvas{display:block;position:absolute;top:0;left:0;z-index:1;}
+
+/* Explorer */
+.explorer{position:absolute;left:0;top:60px;width:calc(100% - 340px);height:calc(100vh - 60px);overflow:auto;padding:10px;display:flex;flex-wrap:wrap;gap:10px;z-index:2;}
+.card{background:rgba(0,0,0,0.35);border-radius:12px;padding:8px;flex:0 0 140px;text-align:center;color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;transition:0.2s;}
+.card:hover{transform:scale(1.05);box-shadow:0 0 20px rgba(0,200,255,0.7);}
+.card img, .card video{width:100%;height:80px;object-fit:cover;border-radius:8px;margin-bottom:5px;}
+.listItem{display:flex;justify-content:space-between;padding:6px 10px;background:rgba(0,0,0,0.2);border-radius:6px;margin-bottom:5px;cursor:pointer;transition:0.2s;}
+.listItem:hover{background:rgba(0,0,255,0.2);}
+
+/* Preview */
+#preview{position:absolute;right:0;top:60px;width:320px;height:calc(100vh - 60px);backdrop-filter:blur(20px);background:rgba(0,0,0,0.35);display:flex;flex-direction:column;z-index:5;padding:10px;overflow:hidden;border-left:1px solid rgba(255,255,255,.2);}
+#preview header{font-weight:bold;border-bottom:1px solid rgba(255,255,255,.2);padding-bottom:5px;}
+#viewer{flex:1;overflow:auto;margin:5px 0;}
+#viewer img,#viewer video,#viewer iframe{max-width:100%;border-radius:12px;display:block;margin:0 auto;}
+#previewButtons{display:flex;justify-content:space-between;padding-top:5px;}
+#previewButtons button{flex:1;margin:0 3px;}
+
+/* Footer */
+footer{position:absolute;bottom:0;width:100%;text-align:center;padding:6px;background:rgba(255,255,255,.08);border-top:1px solid rgba(255,255,255,.2);z-index:10;font-size:.8rem;}
+
+/* Glassy Theme */
+.glassyBody{background:rgba(0,0,0,0.25);color:#fff;}
+</style>
+</head>
+<body>
+<header>
+<h1>🌌 Galaxy Project Manager — CLUB777</h1>
+<div class="toolbar">
+<button id="pickFolder">📁 اختر مجرة ملفات</button>
+<select id="theme">
+<option value="dark">Dark</option>
+<option value="light">Light</option>
+<option value="glassy">Glassy</option>
+</select>
+<select id="viewMode">
+<option value="grid">Grid</option>
+<option value="card">Card</option>
+<option value="list">List</option>
+</select>
+<input id="search" placeholder="🔎 بحث أو أوامر (type, ext, name)">
+</div>
+</header>
+
+<canvas id="galaxy"></canvas>
+<div class="explorer" id="explorer"></div>
+
+<div id="preview">
+<header id="previewName">معاينة الملف</header>
+<div id="previewMeta"></div>
+<div id="viewer">اختر نجمًا (ملفًا) للعرض</div>
+<div id="previewButtons">
+<button id="openBtn">فتح</button>
+<button id="downloadBtn">تحميل</button>
+<button id="copyBtn">نسخ الاسم</button>
+</div>
+</div>
+
+<footer>🌐 Project by | AlArabClub777 العرّاب © 2025</footer>
+
+<script>
+// ----- Globals -----
+let files=[], stars=[], current=null;
+const canvas=document.getElementById('galaxy'), ctx=canvas.getContext('2d');
+const explorer=document.getElementById('explorer');
+const previewName=document.getElementById('previewName');
+const previewMeta=document.getElementById('previewMeta');
+const viewer=document.getElementById('viewer');
+
+function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+resize();window.addEventListener('resize',resize);
+
+// ----- File Picker -----
+document.getElementById('pickFolder').onclick=async ()=>{
+  try{
+    const dir=await window.showDirectoryPicker();
+    files=[];
+    for await(const entry of dir.values()){
+      if(entry.kind==="file"){
+        const file=await entry.getFile();
+        let color="cyan";
+        if(file.type.startsWith("video")) color="violet";
+        else if(file.name.endsWith(".pdf")) color="red";
+        else if(file.name.endsWith(".html")||file.type==="text/html") color="orange";
+        files.push({name:file.name,type:file.type||"unknown",size:file.size,handle:entry,color:color});
+      }
+    }
+    initStars(); renderExplorer();
+  }catch(e){console.log(e);}
+};
+
+// ----- Stars -----
+function initStars(){
+  stars = files.map(f=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:6+Math.random()*4,color:f.color,file:f,vx:(Math.random()-0.5)*0.6,vy:(Math.random()-0.5)*0.6}));
+}
+
+// ----- Hyper Galaxy with Dynamic Pulse & Attraction -----
+let portalPulse=0;
+function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  portalPulse+=0.05;
+  const pr=80+Math.sin(portalPulse)*30;
+  const grad=ctx.createRadialGradient(canvas.width/2,canvas.height/2,pr*0.3,canvas.width/2,canvas.height/2,pr);
+  grad.addColorStop(0,"rgba(0,200,255,0.7)");
+  grad.addColorStop(1,"transparent");
+  ctx.fillStyle=grad;
+  ctx.beginPath();
+  ctx.arc(canvas.width/2,canvas.height/2,pr,0,Math.PI*2); ctx.fill();
+
+  stars.forEach(s=>{
+    // Attraction towards hovered card
+    const rects = document.querySelectorAll('.card:hover, .listItem:hover');
+    rects.forEach(r=>{
+      const rect=r.getBoundingClientRect();
+      const cx=rect.left+rect.width/2, cy=rect.top+rect.height/2;
+      const dx=cx-s.x, dy=cy-s.y;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<150){ s.vx+=dx*0.0005; s.vy+=dy*0.0005; }
+    });
+
+    s.x+=s.vx; s.y+=s.vy;
+    if(s.x<0||s.x>canvas.width) s.vx*=-1;
+    if(s.y<0||s.y>canvas.height) s.vy*=-1;
+    ctx.shadowBlur=10; ctx.shadowColor=s.color;
+    ctx.fillStyle=s.color; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0;
+  });
+  requestAnimationFrame(draw);
+}
+draw();
+
+// ----- Preview -----
+async function openPreview(f){
+  current=f;
+  previewName.textContent=f.name;
+  previewMeta.textContent=`${(f.size/1024).toFixed(1)} KB — ${f.type}`;
+  viewer.innerHTML='';
+  try{
+    const fileData = await f.handle.getFile();
+    if(f.type.startsWith("image")){ const img=document.createElement('img'); img.src=URL.createObjectURL(fileData); viewer.appendChild(img);}
+    else if(f.type.startsWith("video")){ const v=document.createElement('video'); v.src=URL.createObjectURL(fileData); v.controls=true; v.muted=true; viewer.appendChild(v);}
+    else if(f.name.endsWith(".html")||f.type==="text/html"){ const text=await fileData.text(); const iframe=document.createElement('iframe'); iframe.srcdoc=text; iframe.width="100%"; iframe.height="300"; viewer.appendChild(iframe);}
+    else if(f.name.endsWith(".pdf")){ const iframe=document.createElement('iframe'); iframe.src=URL.createObjectURL(fileData); iframe.width="100%"; iframe.height="300"; viewer.appendChild(iframe);}
+    else{ viewer.textContent='📄 لا توجد معاينة متاحة'; }
+  }catch(e){viewer.textContent='❌ خطأ في المعاينة';}
+}
+
+// ----- Explorer + Thumbnails -----
+let viewMode="grid";
+document.getElementById('viewMode').addEventListener('change', e=>{viewMode=e.target.value; renderExplorer();});
+async function renderExplorer(filtered=files){
+  explorer.innerHTML='';
+  for(const f of filtered){
+    if(viewMode==="grid"||viewMode==="card"){
+      const div=document.createElement('div'); div.className="card";
+      if(f.type.startsWith("image")){ const img=document.createElement('img'); img.src=URL.createObjectURL(await f.handle.getFile()); div.appendChild(img);}
+      else if(f.type.startsWith("video")){ const v=document.createElement('video'); v.src=URL.createObjectURL(await f.handle.getFile()); v.muted=true; v.width=120; v.height=80; v.autoplay=true; v.loop=true; div.appendChild(v);}
+      const label=document.createElement('div'); label.textContent=f.name; div.appendChild(label);
+      div.onclick=()=>openPreview(f);
+      explorer.appendChild(div);
+    } else if(viewMode==="list"){
+      const div=document.createElement('div'); div.className="listItem";
+      div.innerHTML=`<span>${f.name}</span><span>${(f.size/1024).toFixed(1)} KB</span>`; div.onclick=()=>openPreview(f);
+      explorer.appendChild(div);
+    }
+  }
+}
+
+// ----- Smart Search -----
+document.getElementById('search').addEventListener('input', e=>{
+  const q=e.target.value.toLowerCase();
+  const filtered=files.filter(f=>{
+    if(q.startsWith("type:")) return f.type.includes(q.slice(5));
+    if(q.startsWith("ext:")) return f.name.toLowerCase().endsWith(q.slice(4));
+    return f.name.toLowerCase().includes(q);
+  });
+  renderExplorer(filtered);
+});
+
+// ----- Theme Switcher -----
+const themes={dark:{bg:"#000",fg:"#fff"},light:{bg:"#f5f5f5",fg:"#111"},glassy:{bg:"rgba(0,0,0,0.25)",fg:"#fff"}};
+document.getElementById('theme').addEventListener('change', e=>{
+  const t=themes[e.target.value];
+  document.body.style.background=t.bg; document.body.style.color=t.fg;
+  if(e.target.value==="glassy") document.body.classList.add("glassyBody"); else document.body.classList.remove("glassyBody");
+});
+
+// ----- Buttons -----
+document.getElementById('openBtn').onclick=()=>{if(current) window.open('#','_blank')};
+document.getElementById('downloadBtn').onclick=()=>{if(current) current.handle.getFile().then(file=>{const a=document.createElement('a'); a.href=URL.createObjectURL(file); a.download=current.name; a.click();});};
+document.getElementById('copyBtn').onclick=async()=>{if(current){await navigator.clipboard.writeText(current.name); alert('تم نسخ الاسم: '+current.name);}};
+</script>
+</body>
+</html>
