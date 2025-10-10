@@ -1,0 +1,35 @@
+<html>
+<head><title>ALARAB CLUB 777 AI Chat</title></head>
+<body style="background:#111; color:#FFD700; font-family:monospace;">
+  <a href="/dashboard" style="color:#FFD700">⬅ Back</a>
+  <h2>💬 LAN Chat + AI Assistant</h2>
+
+  <p>Name: <input id="name" type="text" value="user123">
+  Room: <input id="room" type="text" value="lobby">
+  <button onclick="connectWS()">Connect</button></p>
+
+  <textarea id="log" cols="60" rows="15" readonly></textarea><br>
+  <input id="msg" type="text" size="40" placeholder="Type... /ai for AI">
+  <button onclick="sendMsg()">Send</button>
+
+  <script>
+    let ws = null;
+    function connectWS(){
+      const n=document.getElementById('name').value;
+      const r=document.getElementById('room').value;
+      ws=new WebSocket("ws://"+window.location.host+"/ws?room="+r+"&name="+n);
+      ws.onmessage=(ev)=>{
+        const m=JSON.parse(ev.data);
+        document.getElementById("log").value += "\n"+m.from+": "+m.text;
+      };
+    }
+    function sendMsg(){
+      const txt=document.getElementById('msg').value;
+      if(ws && txt){
+        ws.send(JSON.stringify({type:"chat", text:txt}));
+        document.getElementById('msg').value="";
+      }
+    }
+  </script>
+</body>
+</html>
