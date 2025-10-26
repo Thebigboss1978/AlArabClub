@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>ARA NoodleVerse — AlArab Club 777 (v1)</title>
+<style>
+  :root{--bg:#070709;--card:#0b0c0f;--accent:#ffd700;--muted:#9aa3a8}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI","Noto Sans Arabic","Cairo",sans-serif;background:linear-gradient(180deg,#000010,#03030a);color:#eee}
+  header{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid rgba(255,215,0,0.04)}
+  h1{margin:0;font-size:1.05rem;color:var(--accent)}
+  .controls{display:flex;gap:10px;align-items:center}
+  button.cta{background:linear-gradient(90deg,#ffd700,#ffb300);border:none;padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer;color:#000}
+  button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:8px 10px;border-radius:8px;cursor:pointer}
+  #canvasWrap{position:fixed;inset:0;z-index:0}
+  canvas{width:100%;height:100%;display:block}
+  .panel{position:fixed;left:18px;bottom:18px;z-index:999;background:rgba(0,0,0,0.6);padding:12px;border-radius:10px;border:1px solid rgba(255,215,0,0.06)}
+  .panel small{color:var(--muted);display:block;margin-top:6px}
+  .node-badge{position:fixed;right:18px;top:18px;z-index:999;background:rgba(0,0,0,0.6);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.02)}
+  .node-list{max-height:240px;overflow:auto}
+  .node-item{padding:6px;border-radius:6px;margin:6px 0;background:rgba(255,255,255,0.02);font-size:0.95rem}
+  footer{position:fixed;right:18px;bottom:18px;z-index:999;color:var(--muted);font-size:0.85rem}
+  @media(max-width:760px){header{flex-direction:column;align-items:flex-start} .node-badge{right:10px;left:10px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>ARA — NoodleVerse 𓂀</h1>
+    <div style="color:var(--muted);font-size:0.9rem;margin-top:6px">بيت الذكاء — العائلة الحية من الوُكلاء (صوتي + بصري)</div>
+  </div>
+
+  <div class="controls">
+    <button id="startBtn" class="cta">⚡ تشغيل المنظومة</button>
+    <button id="exportBtn" class="ghost">Export State</button>
+  </div>
+</header>
+
+<div id="canvasWrap"><canvas id="meshCanvas"></canvas></div>
+
+<div class="panel" id="panel">
+  <div><strong>حالة النظام:</strong> <span id="status">متوقّف</span></div>
+  <small>اضغط زر التشغيل لتطلق الشبكة. انقر على أي "نودل" لسماع ردّه.</small>
+</div>
+
+<div class="node-badge">
+  <strong>عائلة النودلز</strong>
+  <div class="node-list" id="nodeList" style="margin-top:8px"></div>
+</div>
+
+<footer>AlArab Club 777 • ARA-777 — Ready</footer>
+
+<script>
+/* ========== ARA NoodleVerse v1 ========== */
+const canvas = document.getElementById('meshCanvas');
+const ctx = canvas.getContext('2d');
+function resize(){ canvas.width = innerWidth; canvas.height = innerHeight; }
+addEventListener('resize', resize); resize();
+
+/* Node definitions (names + personalities + sample lines) */
+const nodeDefs = [
+  {id:0, name:"Ara-Core", role:"العقل الداخلي", voice:"male", lines:["تم تفعيل العقل.","أستلمت الإشارة."]},
+  {id:1, name:"Sarai", role:"مرشدة الرحلات", voice:"female", lines:["جاهزة لجولة الأهرامات.","حجز الرحلة تم بنجاح."]},
+  {id:2, name:"Zayn", role:"الاقتصادي", voice:"male", lines:["حساب التحويل تم بالـBNB.","تحليل السوق: ارتفاع طفيف."]},
+  {id:3, name:"BeBa", role:"الروحاني", voice:"female", lines:["نوازن التردد على 777Hz.","جلسة التركيز جاهزة."]},
+  {id:4, name:"Support", role:"خدمة العملاء", voice:"female", lines:["كيف أستطيع مساعدتك اليوم؟","طلبك مسجّل وسيتم تنفيذه."]},
+  {id:5, name:"Friend", role:"الرفيق", voice:"male", lines:["أهلاً يا صديق!","دعنا نبدأ المغامرة!"]}
+];
+
+/* create nodes with positions and state */
+let nodes = nodeDefs.map(d=>({
+  ...d,
+  x: Math.random()*canvas.width,
+  y: Math.random()*canvas.height,
+  vx: (Math.random()-0.5)*0.6,
+  vy: (Math.random()-0.5)*0.6,
+  active:false, pulse:0
+}));
+
+/* build node list UI */
+const nodeList = document.getElementById('nodeList');
+nodes.forEach(n=>{
+  const div = document.createElement('div');
+  div.className = 'node-item';
+  div.id = 'node-ui-'+n.id;
+  div.innerHTML = `<strong>${n.name}</strong> — <small style="color:var(--muted)">${n.role}</small>`;
+  nodeList.appendChild(div);
+});
+
+/* audio context for beats & TTS */
+const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+function beat(freq=220, dur=0.06, gain=0.06){
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type='sine'; o.frequency.value=freq;
+  g.gain.value = gain;
+  o.connect(g); g.connect(audioCtx.destination);
+  o.start(); o.stop(audioCtx.currentTime + dur);
+}
+
+/* draw loop */
+function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  // backdrop subtle
+  const grd = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 10, canvas.width/2, canvas.height/2, Math.max(canvas.width, canvas.height));
+  grd.addColorStop(0, 'rgba(17,16,24,0.6)');
+  grd.addColorStop(1, 'rgba(0,0,0,0.9)');
+  ctx.fillStyle = grd;
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  // links
+  ctx.strokeStyle='rgba(255,215,0,0.08)';
+  ctx.lineWidth = 1;
+  for(let i=0;i<nodes.length;i++){
+    for(let j=i+1;j<nodes.length;j++){
+      const d = dist(nodes[i], nodes[j]);
+      if(d < 260){
+        ctx.globalAlpha = 1 - (d/260);
+        ctx.beginPath();
+        ctx.moveTo(nodes[i].x, nodes[i].y);
+        ctx.lineTo(nodes[j].x, nodes[j].y);
+        ctx.stroke();
+      }
+    }
+  }
+  ctx.globalAlpha = 1;
+
+  // nodes
+  nodes.forEach(n=>{
+    n.x += n.vx; n.y += n.vy;
+    if(n.x < 20 || n.x > canvas.width-20) n.vx *= -1;
+    if(n.y < 20 || n.y > canvas.height-20) n.vy *= -1;
+    // pulse decay
+    n.pulse *= 0.92;
+    const r = 6 + n.pulse*4;
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, r, 0, Math.PI*2);
+    ctx.fillStyle = n.active ? '#ffd700' : '#2f2f35';
+    ctx.shadowBlur = n.active ? 18 : 2;
+    ctx.shadowColor = n.active ? '#ffd700' : 'rgba(0,0,0,0.2)';
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // small label
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    ctx.font = '12px "Noto Sans Arabic",sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(n.name, n.x, n.y + r + 14);
+  });
+
+  requestAnimationFrame(draw);
+}
+function dist(a,b){ const dx=a.x-b.x, dy=a.y-b.y; return Math.sqrt(dx*dx+dy*dy); }
+draw();
+
+/* heartbeat: every 3s a random node pulses */
+let heartbeatInterval = null;
+function startHeartbeat(){
+  if(heartbeatInterval) clearInterval(heartbeatInterval);
+  heartbeatInterval = setInterval(()=>{
+    const idx = Math.floor(Math.random()*nodes.length);
+    pulseNode(nodes[idx].id);
+  }, 3000);
+}
+
+/* pulse a node visually + sound */
+function pulseNode(id){
+  const n = nodes.find(x=>x.id===id);
+  if(!n) return;
+  n.active = true; n.pulse = 2.4;
+  document.getElementById('node-ui-'+n.id).style.background = 'linear-gradient(90deg, rgba(255,215,0,0.06), transparent)';
+  beat(240 + Math.random()*80, 0.09, 0.06);
+  // auto off
+  setTimeout(()=>{
+    n.active = false; n.pulse = 0;
+    document.getElementById('node-ui-'+n.id).style.background = '';
+  }, 700);
+}
+
+/* click-to-speak: TTS reply for node */
+function speakText(text, lang='ar-SA'){
+  // use SpeechSynthesis (browser TTS)
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = lang;
+  u.rate = 0.95;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+}
+
+/* clicking on canvas detection of nearest node */
+canvas.addEventListener('click', (ev)=>{
+  const rect = canvas.getBoundingClientRect();
+  const x = ev.clientX - rect.left;
+  const y = ev.clientY - rect.top;
+  // find nearest within threshold
+  let nearest = null; let nd = 9999;
+  nodes.forEach(n=>{
+    const d = Math.hypot(n.x - x, n.y - y);
+    if(d < nd){ nd = d; nearest = n; }
+  });
+  if(nearest && nd < 60){
+    // pulse and speak
+    pulseNode(nearest.id);
+    const line = nearest.lines[Math.floor(Math.random()*nearest.lines.length)];
+    speakText(line);
+  }
+});
+
+/* microphone loudness listener -> triggers global pulse */
+navigator.mediaDevices.getUserMedia({audio:true})
+.then(stream=>{
+  const ac = new (window.AudioContext||window.webkitAudioContext)();
+  const src = ac.createMediaStreamSource(stream);
+  const analyser = ac.createAnalyser();
+  analyser.fftSize = 512;
+  src.connect(analyser);
+  const data = new Uint8Array(analyser.frequencyBinCount);
+  function listen(){
+    analyser.getByteFrequencyData(data);
+    let sum=0;
+    for(let i=0;i<data.length;i++) sum += data[i];
+    const avg = sum / data.length;
+    if(avg > 70){ // threshold - adjust if too sensitive
+      // global reaction
+      nodes.forEach(n=>{ n.active = true; n.pulse = 2; });
+      beat(300, 0.12, 0.06);
+      // ARA-core acknowledgement
+      const core = nodes.find(n=>n.name==='Ara-Core');
+      if(core) setTimeout(()=>{ speakText("[Ara]: تلقيت إشارة صوتية. أبدأ التنفيذ."); }, 220);
+      setTimeout(()=> nodes.forEach(n=>{ n.active = false; n.pulse = 0; }), 700);
+    }
+    requestAnimationFrame(listen);
+  }
+  listen();
+})
+.catch(err=>{
+  console.warn("ميكروفون غير متاح أو تم رفض الإذن:", err);
+});
+
+/* start/stop control */
+const startBtn = document.getElementById('startBtn');
+const status = document.getElementById('status');
+let running = false;
+startBtn.addEventListener('click', ()=>{
+  if(!running){
+    running = true;
+    startBtn.innerText = 'النظام يعمل... ⚙️';
+    status.innerText = 'قيد التشغيل';
+    // Start heartbeat and small random wander speed increase
+    startHeartbeat();
+    nodes.forEach(n=>{ n.vx *= 1.3; n.vy *= 1.3; });
+    // ARA startup line
+    setTimeout(()=>{ speakText("[Ara]: النظام نشط. أهلاً بك في بيت العائلة."); }, 500);
+  } else {
+    // toggle off (optional)
+    running = false;
+    startBtn.innerText = '⚡ تشغيل المنظومة';
+    status.innerText = 'متوقّف';
+    clearInterval(heartbeatInterval);
+  }
+});
+
+/* Export state as JSON */
+document.getElementById('exportBtn').addEventListener('click', ()=>{
+  const state = {
+    timestamp: new Date().toISOString(),
+    nodes: nodes.map(n=>({id:n.id,name:n.name,role:n.role,x:Math.round(n.x),y:Math.round(n.y)}))
+  };
+  const blob = new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'ara_noodles_state.json'; document.body.appendChild(a); a.click();
+  a.remove(); URL.revokeObjectURL(url);
+});
+
+/* small auto-start if desired (commented) */
+// startBtn.click(); // إذا أردت يبدأ تلقائياً عند فتح الملف
+
+/* end of script */
+</script>
+
+</body>
+</html>
